@@ -1,0 +1,1 @@
+{"block": {"text": "Please pick a valid git status after applied commands:", "name": "choice", "source": {"sample_size": "0", "preserve_order": false, "is_options_feedback": false, "is_multiple_choice": false, "is_html_enabled": true, "is_always_correct": false, "options": []}}}
