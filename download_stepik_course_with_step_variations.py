@@ -32,18 +32,16 @@ print("Attempting to download course: " + str(course_id))
 # Get a token
 print("Requesting token...")
 auth = requests.auth.HTTPBasicAuth(client_id, client_secret)
-response = requests.post('https://stepik.org/oauth2/token/',				#отправка формы для аутентификации, возвращает в случае успеха <Response [200]>
+response = requests.post('https://stepik.org/oauth2/token/',
                          data={'grant_type': 'client_credentials'},
                          auth=auth)
 						 
-print("response = " + str(response.json()))			#response = {'access_token': 'gOUTIklNhYVXunPL6F3UisEzBnrR9T', 'expires_in': 36000, 'token_type': 'Bearer', 'scope': 'read write'}			 
+print("response = " + str(response.json()))			 
 if "503" in str(response):
     print("\nERROR: Received 503 error from Stepik")
     print("Perhaps they are doing maintenance? Check Stepik and try again later")
     exit(-1)
-token = response.json().get('access_token', None)  #response.json() - объект response содержит json, используем .json() чтобы декодировать результат
-
-print("token = " + str(token))
+token = response.json().get('access_token', None)
 
 if not token:
     print("\nERROR: Unable to authorize with provided credentials")
@@ -53,11 +51,11 @@ if not token:
 print("Token requested successfully\n")
 
 # Call API (https://stepik.org/api/docs/) to download a single object
-def fetch_object(obj_class, obj_id):                                #получить объект (курс, id курса), (степ, Id степа), взять из него данные по ключу (obj_class+'s')
+def fetch_object(obj_class, obj_id):
     api_url = '{}/api/{}s/{}'.format(api_host, obj_class, obj_id)
     response = requests.get(api_url,
                             headers={'Authorization': 'Bearer ' + token}).json()
-    return response['{}s'.format(obj_class)][0]                      #    см. файлы объект курс, объект урок для наглядности       
+    return response['{}s'.format(obj_class)][0]
 
 # Fetch all objects
 def fetch_objects(obj_class, obj_ids):                             # получить список объектов по списку id
@@ -65,7 +63,7 @@ def fetch_objects(obj_class, obj_ids):                             # получ�
     # Fetch objects by 30 items,
     # so we won't bump into HTTP request length limits
     step_size = 30
-    for i in range(0, len(obj_ids), step_size):                     #в функции range первый параметр - начальное значение, второй - до которого, не включая его, третий - величина изменения индексной переменной, т.е. шаг 0, 30, 60, 90 ...
+    for i in range(0, len(obj_ids), step_size):
         obj_ids_slice = obj_ids[i:i + step_size]
         api_url = '{}/api/{}s?{}'.format(api_host, obj_class,
                                          '&'.join('ids[]={}'.format(obj_id)
@@ -85,12 +83,11 @@ def fetch_step_objects(lesson_id, position_id):
                             headers={'Authorization': 'Bearer ' + token}).json()
     for step in response['steps']:
         if step['position'] == int(position_id):
-            objs.append(step)
+            step_source = fetch_object('step-source', step['id'])
+            objs.append(step_source)
     return objs
 
-#ss = fetch_step_objects('67734', '1')   
-#print('67734 =' + str(ss)) 
-   
+
 # Perform the fetches
 course = fetch_object('course', course_id)                   #получить курс
 sections = fetch_objects('section', course['sections'])      #получить модули
@@ -119,19 +116,16 @@ for secIndex, section in enumerate(sections):
         lesson = fetch_object('lesson', lesson_id)
 
         qty_steps = len(lesson['steps'])
-        print('qty_steps===============' + str(qty_steps))
         for step_position in range(qty_steps):                                       
             print("Downloading step " + str(step_position+1) + " of " + str(qty_steps) + "...")
             step_source = fetch_step_objects(lesson_id, step_position + 1)                                        #получаем все альтернативы степа по номеру урока и по номеру позиции
             for varIndex, step in enumerate(step_source):
-                print('varIndex = ' + str(varIndex) )
                 path = [
                     '{} {}'.format(str(course['id']).replace('/','-').zfill(2), course['title'].strip()),
                     '{} {}'.format(str(section['position']).replace('/','-').zfill(2), section['title'].strip()),
                     '{} {}'.format(str(unit['position']).replace('/','-').zfill(2), lesson['title'].strip()),
                     '{}_{}_{}_{}.step'.format(lesson['id'], str(step['position']).zfill(2), step['block']['name'], str(varIndex+1).zfill(2))
                 ]
-                print("path " + str(path) + "...")
                 try:
                     os.makedirs(os.path.join(os.curdir, *path[:-1]))
                 except:
