@@ -13,8 +13,8 @@ import datetime
 # Enter parameters below:
 # Get your keys at https://stepik.org/oauth2/applications/
 # (client type = confidential, authorization grant type = client credentials)
-client_id = 'o5h7MTFBzBXFT4yF3q7NF15BIqYqZoPvTcc3pJA5'
-client_secret = 'BnW5hV8lNzxprquzGpSd0rwn1LoKNGLL9MguUTu1woRuBOEZ6jtNvMnI64wGPpwPWlfjHp2pNlTMw7eLJ8oB365yYmCz6qKHxFY6Sn0NV13PsEgM3Yc57ntwLcz5xwWC'
+client_id = ''
+client_secret = ''
 api_host = 'https://stepik.org'
 
 # parse args (to get course ID)
