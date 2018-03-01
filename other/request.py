@@ -33,7 +33,7 @@ class StepicApiRequest:
         step_id = None
         lesson = int(lesson)
         step = int(step)
-        print step
+        print(step)
         for lsn in lessons_info['lessons']:
             if lsn['id'] == lesson:
                 if (step - 1) < len(lsn['steps']):
@@ -68,6 +68,6 @@ class StepicApiRequest:
                 None,
                 os.path.abspath(image_file.strip())
             )
-            print image_link_template.format(
+            print(image_link_template.format(
                 json.loads(response.text)[os.path.basename(image_file.strip())]
-            )
+            ))
