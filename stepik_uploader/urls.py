@@ -13,12 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from app_upload_to_stepik import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', views.home)
+    url(r'^$', views.home),
+    url(r'^accounts/', include('allauth.urls')), #you can use the URLs provided by allauth: account_login, account_logout, account_set_password…
 ] + staticfiles_urlpatterns()
